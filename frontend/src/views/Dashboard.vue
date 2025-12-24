@@ -104,58 +104,10 @@
         </div>
       </div>
 
-      <!-- System Stats & Traffic Chart -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- System Stats -->
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('dashboard.systemStatus') }}</h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-400">{{ t('dashboard.cpu') }}</span>
-                <span :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ formatPercent(store.system.cpu_percent) }}</span>
-              </div>
-              <n-progress
-                type="line"
-                :percentage="store.system.cpu_percent"
-                :show-indicator="false"
-                :height="8"
-                :border-radius="4"
-                :color="getProgressColor(store.system.cpu_percent)"
-              />
-            </div>
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-400">{{ t('dashboard.memory') }}</span>
-                <span :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ formatPercent(store.system.memory_percent) }}</span>
-              </div>
-              <n-progress
-                type="line"
-                :percentage="store.system.memory_percent"
-                :show-indicator="false"
-                :height="8"
-                :border-radius="4"
-                :color="getProgressColor(store.system.memory_percent)"
-              />
-            </div>
-            <div class="pt-2 border-t" :class="settingsStore.isDark ? 'border-dark-border' : 'border-gray-200'">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-400">{{ t('dashboard.networkIn') }}</span>
-                <span class="text-green-400">{{ formatBytesRate(store.system.net_rate_in) }}</span>
-              </div>
-              <div class="flex justify-between text-sm mt-2">
-                <span class="text-gray-400">{{ t('dashboard.networkOut') }}</span>
-                <span class="text-blue-400">{{ formatBytesRate(store.system.net_rate_out) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Traffic Chart -->
-        <div class="card lg:col-span-2">
-          <h3 class="text-lg font-semibold mb-4" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('dashboard.realtimeTraffic') }}</h3>
-          <div ref="chartRef" class="h-64"></div>
-        </div>
+      <!-- Traffic Chart -->
+      <div class="card mb-8">
+        <h3 class="text-lg font-semibold mb-4" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('dashboard.realtimeTraffic') }}</h3>
+        <div ref="chartRef" class="h-64"></div>
       </div>
 
       <!-- Tunnel List -->

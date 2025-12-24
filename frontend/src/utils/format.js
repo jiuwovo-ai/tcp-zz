@@ -10,11 +10,12 @@ export function formatBytes(bytes, decimals = 2) {
 }
 
 export function formatBytesRate(bytesPerSecond, decimals = 2) {
-  if (!bytesPerSecond || bytesPerSecond === 0) return '0 B/s'
+  if (bytesPerSecond === undefined || bytesPerSecond === null || bytesPerSecond === 0 || isNaN(bytesPerSecond)) return '0 B/s'
 
   const k = 1024
   const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s']
   const i = Math.floor(Math.log(Math.abs(bytesPerSecond)) / Math.log(k))
+  if (i < 0 || i >= sizes.length) return '0 B/s'
 
   return parseFloat((bytesPerSecond / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i]
 }
