@@ -90,12 +90,12 @@
 
         <div class="card card-gradient-yellow animate-fade-in-up animate-delay-3" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
+            <div>
               <p class="stat-label">{{ t('dashboard.uptime') }}</p>
-              <p class="stat-value text-yellow-400 font-mono whitespace-nowrap">{{ formatUptime(store.system.uptime) }}</p>
+              <p class="stat-value text-yellow-400">{{ formatUptime(store.system.uptime) }}</p>
               <p class="text-sm text-gray-500 mt-2">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
             </div>
-            <div class="icon-container icon-container-yellow flex-shrink-0 ml-2">
+            <div class="icon-container icon-container-yellow">
               <n-icon size="24" class="text-yellow-400">
                 <Time />
               </n-icon>
@@ -126,16 +126,16 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full table-fixed">
+          <table class="w-full">
             <thead>
               <tr class="text-left text-gray-400 text-sm border-b" :class="settingsStore.isDark ? 'border-dark-border' : 'border-gray-200'">
-                <th class="pb-3 font-medium w-20">{{ t('common.name') }}</th>
-                <th class="pb-3 font-medium w-44">{{ t('dashboard.localPort') }}</th>
-                <th class="pb-3 font-medium w-44">{{ t('dashboard.target') }}</th>
-                <th class="pb-3 font-medium w-20">{{ t('dashboard.protocol') }}</th>
-                <th class="pb-3 font-medium" style="width: 220px; min-width: 220px;">{{ t('dashboard.traffic') }}</th>
-                <th class="pb-3 font-medium w-24">{{ t('dashboard.latency') }}</th>
-                <th class="pb-3 font-medium w-28">{{ t('common.status') }}</th>
+                <th class="pb-3 font-medium">{{ t('common.name') }}</th>
+                <th class="pb-3 font-medium">{{ t('dashboard.localPort') }}</th>
+                <th class="pb-3 font-medium">{{ t('dashboard.target') }}</th>
+                <th class="pb-3 font-medium">{{ t('dashboard.protocol') }}</th>
+                <th class="pb-3 font-medium">{{ t('dashboard.traffic') }}</th>
+                <th class="pb-3 font-medium">{{ t('dashboard.latency') }}</th>
+                <th class="pb-3 font-medium">{{ t('common.status') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -153,14 +153,10 @@
                     {{ tunnel.rule.protocol.toUpperCase() }}
                   </n-tag>
                 </td>
-                <td class="py-3" style="width: 220px; min-width: 220px; max-width: 220px;">
-                  <div class="flex items-center font-mono text-xs whitespace-nowrap">
-                    <span class="text-blue-400">↑</span>
-                    <span class="text-blue-400" style="width: 75px; display: inline-block; text-align: right;">{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
-                    <span class="text-gray-500 mx-1">/</span>
-                    <span class="text-green-400">↓</span>
-                    <span class="text-green-400" style="width: 75px; display: inline-block;">{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
-                  </div>
+                <td class="py-3" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">
+                  <span class="text-blue-400">↑{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
+                  <span class="mx-1 text-gray-500">/</span>
+                  <span class="text-green-400">↓{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
                 </td>
                 <td class="py-3">
                   <span :class="getLatencyClass(tunnel.latency)">
