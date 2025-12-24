@@ -1,25 +1,39 @@
 <template>
   <div class="min-h-screen" :class="settingsStore.isDark ? 'bg-dark-bg' : 'bg-gray-50'">
     <!-- Header -->
-    <header class="border-b" :class="settingsStore.isDark ? 'border-dark-border bg-dark-card' : 'border-gray-200 bg-white'">
+    <header class="border-b backdrop-blur-md sticky top-0 z-50" :class="settingsStore.isDark ? 'border-dark-border bg-dark-card/80' : 'border-gray-200 bg-white/80'">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-bold" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('dashboard.title') }}</h1>
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <n-icon size="18" class="text-white"><GitNetwork /></n-icon>
+              </div>
+              <h1 class="text-xl font-bold gradient-text">{{ t('dashboard.title') }}</h1>
+            </div>
             <span
               class="status-dot"
               :class="wsConnected ? 'status-normal' : 'status-error'"
             ></span>
           </div>
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
             <router-link to="/nodes">
-              <n-button quaternary>{{ t('nodes.manageNodes') }}</n-button>
+              <n-button quaternary size="small" class="!rounded-lg">
+                <template #icon><n-icon><Server /></n-icon></template>
+                {{ t('nodes.manageNodes') }}
+              </n-button>
             </router-link>
             <router-link to="/tunnels">
-              <n-button quaternary>{{ t('dashboard.manageTunnels') }}</n-button>
+              <n-button quaternary size="small" class="!rounded-lg">
+                <template #icon><n-icon><GitNetwork /></n-icon></template>
+                {{ t('dashboard.manageTunnels') }}
+              </n-button>
             </router-link>
             <SettingsDropdown />
-            <n-button quaternary @click="handleLogout">{{ t('common.logout') }}</n-button>
+            <n-button quaternary size="small" class="!rounded-lg" @click="handleLogout">
+              <template #icon><n-icon><LogOut /></n-icon></template>
+              {{ t('common.logout') }}
+            </n-button>
           </div>
         </div>
       </div>
@@ -29,55 +43,63 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="card">
+        <div class="card card-gradient-blue animate-fade-in-up" style="opacity: 0;">
           <div class="flex items-center justify-between">
             <div>
               <p class="stat-label">{{ t('dashboard.totalUpload') }}</p>
               <p class="stat-value text-blue-400">{{ formatBytes(store.global.total_out) }}</p>
-              <p class="text-sm text-gray-500 mt-1">{{ formatBytesRate(store.global.rate_out) }}</p>
+              <p class="text-sm text-gray-500 mt-2">{{ formatBytesRate(store.global.rate_out) }}</p>
             </div>
-            <n-icon size="40" class="text-blue-400 opacity-50">
-              <ArrowUp />
-            </n-icon>
+            <div class="icon-container icon-container-blue">
+              <n-icon size="24" class="text-blue-400">
+                <ArrowUp />
+              </n-icon>
+            </div>
           </div>
         </div>
 
-        <div class="card">
+        <div class="card card-gradient-green animate-fade-in-up animate-delay-1" style="opacity: 0;">
           <div class="flex items-center justify-between">
             <div>
               <p class="stat-label">{{ t('dashboard.totalDownload') }}</p>
               <p class="stat-value text-green-400">{{ formatBytes(store.global.total_in) }}</p>
-              <p class="text-sm text-gray-500 mt-1">{{ formatBytesRate(store.global.rate_in) }}</p>
+              <p class="text-sm text-gray-500 mt-2">{{ formatBytesRate(store.global.rate_in) }}</p>
             </div>
-            <n-icon size="40" class="text-green-400 opacity-50">
-              <ArrowDown />
-            </n-icon>
+            <div class="icon-container icon-container-green">
+              <n-icon size="24" class="text-green-400">
+                <ArrowDown />
+              </n-icon>
+            </div>
           </div>
         </div>
 
-        <div class="card">
+        <div class="card card-gradient-purple animate-fade-in-up animate-delay-2" style="opacity: 0;">
           <div class="flex items-center justify-between">
             <div>
               <p class="stat-label">{{ t('dashboard.activeTunnels') }}</p>
               <p class="stat-value text-purple-400">{{ store.activeTunnelCount }}</p>
-              <p class="text-sm text-gray-500 mt-1">{{ store.tunnels.length }} {{ t('dashboard.total') }}</p>
+              <p class="text-sm text-gray-500 mt-2">{{ store.tunnels.length }} {{ t('dashboard.total') }}</p>
             </div>
-            <n-icon size="40" class="text-purple-400 opacity-50">
-              <GitNetwork />
-            </n-icon>
+            <div class="icon-container icon-container-purple">
+              <n-icon size="24" class="text-purple-400">
+                <GitNetwork />
+              </n-icon>
+            </div>
           </div>
         </div>
 
-        <div class="card">
+        <div class="card card-gradient-yellow animate-fade-in-up animate-delay-3" style="opacity: 0;">
           <div class="flex items-center justify-between">
             <div>
               <p class="stat-label">{{ t('dashboard.uptime') }}</p>
               <p class="stat-value text-yellow-400">{{ formatUptime(store.system.uptime) }}</p>
-              <p class="text-sm text-gray-500 mt-1">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
+              <p class="text-sm text-gray-500 mt-2">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
             </div>
-            <n-icon size="40" class="text-yellow-400 opacity-50">
-              <Time />
-            </n-icon>
+            <div class="icon-container icon-container-yellow">
+              <n-icon size="24" class="text-yellow-400">
+                <Time />
+              </n-icon>
+            </div>
           </div>
         </div>
       </div>
@@ -190,15 +212,10 @@
                   </span>
                 </td>
                 <td class="py-3">
-                  <div class="flex items-center space-x-2">
-                    <span
-                      class="status-dot"
-                      :class="tunnel.running ? 'status-normal' : 'status-error'"
-                    ></span>
-                    <span :class="tunnel.running ? 'text-green-400' : 'text-gray-500'">
-                      {{ tunnel.running ? t('dashboard.running') : t('dashboard.stopped') }}
-                    </span>
-                  </div>
+                  <span class="badge" :class="tunnel.running ? 'badge-success' : 'badge-error'">
+                    <span class="w-1.5 h-1.5 rounded-full mr-1.5" :class="tunnel.running ? 'bg-green-400' : 'bg-red-400'"></span>
+                    {{ tunnel.running ? t('dashboard.running') : t('dashboard.stopped') }}
+                  </span>
                 </td>
               </tr>
               <tr v-if="store.tunnels.length === 0">
@@ -268,7 +285,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { NIcon, useMessage } from 'naive-ui'
-import { ArrowUp, ArrowDown, GitNetwork, Time, Add } from '@vicons/ionicons5'
+import { ArrowUp, ArrowDown, GitNetwork, Time, Add, Server, LogOut } from '@vicons/ionicons5'
 import * as echarts from 'echarts'
 import { useDashboardStore } from '../stores/dashboard'
 import { useAuthStore } from '../stores/auth'
