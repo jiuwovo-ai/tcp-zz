@@ -66,9 +66,9 @@ func (m *Manager) UpdateNode(node models.Node) error {
 
 func (m *Manager) DeleteNode(id string) error {
 	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, exists := m.nodes[id]; !exists {
+	info, exists := m.nodes[id]
+	if !exists {
+		m.mu.Unlock()
 		return fmt.Errorf("node %s not found", id)
 	}
 
@@ -80,7 +80,26 @@ func (m *Manager) DeleteNode(id string) error {
 	}
 
 	delete(m.nodes, id)
+	m.mu.Unlock()
+
+	// 发送卸载命令到节点（异步，不阻塞）
+	go m.sendUninstallToNode(info)
+
 	return nil
+}
+
+func (m *Manager) sendUninstallToNode(info *NodeInfo) {
+	url := fmt.Sprintf("http://%s:%d/uninstall", info.Node.Host, info.Node.Port)
+
+	req, _ := http.NewRequest("POST", url, nil)
+	req.Header.Set("X-Node-Key", info.Node.Key)
+
+	resp, err := m.client.Do(req)
+	if err != nil {
+		// 节点可能已经离线，忽略错误
+		return
+	}
+	defer resp.Body.Close()
 }
 
 func (m *Manager) GetNode(id string) (*models.NodeWithStatus, error) {

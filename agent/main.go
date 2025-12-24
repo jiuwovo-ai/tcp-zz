@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sync"
 	"sync/atomic"
@@ -120,6 +121,7 @@ func main() {
 	router.DELETE("/tunnels/:id", handleDeleteTunnel)
 	router.POST("/tunnels/:id/start", handleStartTunnel)
 	router.POST("/tunnels/:id/stop", handleStopTunnel)
+	router.POST("/uninstall", handleUninstall)
 
 	go updateRatesLoop()
 
@@ -589,4 +591,37 @@ func registerToMaster() {
 		}
 		resp.Body.Close()
 	}
+}
+
+func handleUninstall(c *gin.Context) {
+	log.Println("🛑 Received uninstall command from master panel")
+
+	// 先返回成功响应
+	c.JSON(http.StatusOK, APIResponse{Success: true, Message: "Uninstalling..."})
+
+	// 异步执行卸载
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+
+		// 停止所有隧道
+		stopAllTunnels()
+
+		log.Println("🗑️ Stopping and disabling service...")
+
+		// 停止并禁用 systemd 服务
+		exec.Command("systemctl", "stop", "port-forward-agent").Run()
+		exec.Command("systemctl", "disable", "port-forward-agent").Run()
+
+		// 删除服务文件
+		os.Remove("/etc/systemd/system/port-forward-agent.service")
+		exec.Command("systemctl", "daemon-reload").Run()
+
+		// 删除安装目录
+		os.RemoveAll("/opt/port-forward-agent")
+
+		log.Println("✅ Uninstall completed, exiting...")
+
+		// 退出进程
+		os.Exit(0)
+	}()
 }
