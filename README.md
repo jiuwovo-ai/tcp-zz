@@ -2,6 +2,14 @@
 
 一个高性能、实时监控的端口转发管理面板，采用现代化 UI 设计。
 
+## 🚀 一键部署
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/jiuwovo-ai/tcp-zz/main/deploy.sh)
+```
+
+部署完成后访问 `http://服务器IP:8080`，默认账号 `admin`，密码 `admin123`
+
 ## 📐 架构设计
 
 ```
