@@ -128,6 +128,7 @@ build_backend() {
     print_info "正在构建后端..."
     cd /opt/port-forward-dashboard/backend
     export PATH=$PATH:/usr/local/go/bin
+    go mod tidy
     go build -o port-forward-panel .
     print_success "后端构建完成"
 }
