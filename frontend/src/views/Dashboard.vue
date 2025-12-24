@@ -45,12 +45,12 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="card card-gradient-blue animate-fade-in-up" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="stat-label">{{ t('dashboard.totalUpload') }}</p>
-              <p class="stat-value text-blue-400">{{ formatBytes(store.global.total_out) }}</p>
-              <p class="text-sm text-gray-500 mt-2">{{ formatBytesRate(store.global.rate_out) }}</p>
+              <p class="stat-value text-blue-400 whitespace-nowrap">{{ formatBytes(store.global.total_out) }}</p>
+              <p class="text-sm text-gray-500 mt-2 whitespace-nowrap">{{ formatBytesRate(store.global.rate_out) }}</p>
             </div>
-            <div class="icon-container icon-container-blue">
+            <div class="icon-container icon-container-blue flex-shrink-0 ml-2">
               <n-icon size="24" class="text-blue-400">
                 <ArrowUp />
               </n-icon>
@@ -60,12 +60,12 @@
 
         <div class="card card-gradient-green animate-fade-in-up animate-delay-1" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="stat-label">{{ t('dashboard.totalDownload') }}</p>
-              <p class="stat-value text-green-400">{{ formatBytes(store.global.total_in) }}</p>
-              <p class="text-sm text-gray-500 mt-2">{{ formatBytesRate(store.global.rate_in) }}</p>
+              <p class="stat-value text-green-400 whitespace-nowrap">{{ formatBytes(store.global.total_in) }}</p>
+              <p class="text-sm text-gray-500 mt-2 whitespace-nowrap">{{ formatBytesRate(store.global.rate_in) }}</p>
             </div>
-            <div class="icon-container icon-container-green">
+            <div class="icon-container icon-container-green flex-shrink-0 ml-2">
               <n-icon size="24" class="text-green-400">
                 <ArrowDown />
               </n-icon>
@@ -75,12 +75,12 @@
 
         <div class="card card-gradient-purple animate-fade-in-up animate-delay-2" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="stat-label">{{ t('dashboard.activeTunnels') }}</p>
-              <p class="stat-value text-purple-400">{{ store.activeTunnelCount }}</p>
-              <p class="text-sm text-gray-500 mt-2">{{ store.tunnels.length }} {{ t('dashboard.total') }}</p>
+              <p class="stat-value text-purple-400 whitespace-nowrap">{{ store.activeTunnelCount }}</p>
+              <p class="text-sm text-gray-500 mt-2 whitespace-nowrap">{{ store.tunnels.length }} {{ t('dashboard.total') }}</p>
             </div>
-            <div class="icon-container icon-container-purple">
+            <div class="icon-container icon-container-purple flex-shrink-0 ml-2">
               <n-icon size="24" class="text-purple-400">
                 <GitNetwork />
               </n-icon>
@@ -90,12 +90,12 @@
 
         <div class="card card-gradient-yellow animate-fade-in-up animate-delay-3" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="stat-label">{{ t('dashboard.uptime') }}</p>
-              <p class="stat-value text-yellow-400">{{ formatUptime(store.system.uptime) }}</p>
-              <p class="text-sm text-gray-500 mt-2">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
+              <p class="stat-value text-yellow-400 whitespace-nowrap">{{ formatUptime(store.system.uptime) }}</p>
+              <p class="text-sm text-gray-500 mt-2 whitespace-nowrap">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
             </div>
-            <div class="icon-container icon-container-yellow">
+            <div class="icon-container icon-container-yellow flex-shrink-0 ml-2">
               <n-icon size="24" class="text-yellow-400">
                 <Time />
               </n-icon>
