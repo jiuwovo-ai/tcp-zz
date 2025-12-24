@@ -132,6 +132,23 @@ const messages = {
       installStep2: 'Run the installation command',
       installStep3: 'Done!',
       installStep3Desc: 'The node will automatically connect to the panel after installation'
+    },
+    settings: {
+      changePassword: 'Change Password',
+      oldPassword: 'Current Password',
+      newPassword: 'New Password',
+      newUsername: 'New Username',
+      confirmPassword: 'Confirm Password',
+      oldPasswordPlaceholder: 'Enter current password',
+      newPasswordPlaceholder: 'Enter new password (leave empty to keep)',
+      newUsernamePlaceholder: 'Enter new username (leave empty to keep)',
+      confirmPasswordPlaceholder: 'Confirm new password',
+      oldPasswordRequired: 'Current password is required',
+      passwordTooShort: 'Password must be at least 6 characters',
+      passwordMismatch: 'Passwords do not match',
+      noChanges: 'Please enter new username or password',
+      passwordChanged: 'Password changed successfully',
+      changeFailed: 'Failed to change password'
     }
   },
   zh: {
@@ -265,6 +282,23 @@ const messages = {
       installStep2: '执行安装命令',
       installStep3: '完成！',
       installStep3Desc: '安装完成后节点将自动连接到面板'
+    },
+    settings: {
+      changePassword: '修改密码',
+      oldPassword: '当前密码',
+      newPassword: '新密码',
+      newUsername: '新用户名',
+      confirmPassword: '确认密码',
+      oldPasswordPlaceholder: '请输入当前密码',
+      newPasswordPlaceholder: '请输入新密码（留空保持不变）',
+      newUsernamePlaceholder: '请输入新用户名（留空保持不变）',
+      confirmPasswordPlaceholder: '请再次输入新密码',
+      oldPasswordRequired: '请输入当前密码',
+      passwordTooShort: '密码长度至少6位',
+      passwordMismatch: '两次密码输入不一致',
+      noChanges: '请输入新用户名或新密码',
+      passwordChanged: '密码修改成功',
+      changeFailed: '密码修改失败'
     }
   }
 }

@@ -82,6 +82,9 @@ func (s *Server) setupRoutes() {
 			auth.PUT("/node-rules/:id", s.handleUpdateNodeRule)
 			auth.DELETE("/node-rules/:id", s.handleDeleteNodeRule)
 			auth.POST("/node-rules/:id/toggle", s.handleToggleNodeRule)
+
+			// 修改密码
+			auth.POST("/change-password", s.handleChangePassword)
 		}
 
 		// 节点心跳（不需要JWT认证，使用节点Key认证）
@@ -236,6 +239,39 @@ func (s *Server) handleToggleRule(c *gin.Context) {
 func (s *Server) handleSystemStats(c *gin.Context) {
 	stats := s.monitor.GetStats(s.fm.GetActiveTunnelCount(), s.fm.GetUptime())
 	c.JSON(http.StatusOK, models.APIResponse{Success: true, Data: stats})
+}
+
+func (s *Server) handleChangePassword(c *gin.Context) {
+	var req struct {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+		NewUsername string `json:"new_username"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{Success: false, Message: "Invalid request"})
+		return
+	}
+
+	// 验证旧密码
+	if req.OldPassword != s.cfg.Password {
+		c.JSON(http.StatusUnauthorized, models.APIResponse{Success: false, Message: "旧密码错误"})
+		return
+	}
+
+	// 更新用户名（如果提供）
+	if req.NewUsername != "" {
+		s.cfg.Username = req.NewUsername
+	}
+
+	// 更新密码（如果提供）
+	if req.NewPassword != "" {
+		s.cfg.Password = req.NewPassword
+	}
+
+	// 保存配置
+	s.cfg.Save()
+
+	c.JSON(http.StatusOK, models.APIResponse{Success: true, Message: "密码修改成功"})
 }
 
 var upgrader = websocket.Upgrader{

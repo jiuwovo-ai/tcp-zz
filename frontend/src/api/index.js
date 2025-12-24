@@ -107,5 +107,13 @@ export default {
 
   async getNodeInstallScript(nodeId) {
     return instance.get(`/nodes/${nodeId}/install`)
+  },
+
+  async changePassword(oldPassword, newPassword, newUsername) {
+    return instance.post('/change-password', {
+      old_password: oldPassword,
+      new_password: newPassword,
+      new_username: newUsername
+    })
   }
 }
