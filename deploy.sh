@@ -160,6 +160,52 @@ EOF
     print_success "服务创建完成"
 }
 
+# 修改密码
+change_password() {
+    CONFIG_FILE="/opt/port-forward-dashboard/backend/config.json"
+    
+    echo ""
+    read -p "请输入新的用户名 (留空保持默认 admin): " NEW_USERNAME
+    read -s -p "请输入新的密码 (留空保持默认 admin123): " NEW_PASSWORD
+    echo ""
+    
+    if [ -n "$NEW_USERNAME" ] || [ -n "$NEW_PASSWORD" ]; then
+        # 读取当前配置
+        if [ -f "$CONFIG_FILE" ]; then
+            CURRENT_USERNAME=$(grep -o '"username"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_FILE" | cut -d'"' -f4)
+            CURRENT_PASSWORD=$(grep -o '"password"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_FILE" | cut -d'"' -f4)
+        else
+            CURRENT_USERNAME="admin"
+            CURRENT_PASSWORD="admin123"
+        fi
+        
+        # 使用新值或保持原值
+        FINAL_USERNAME="${NEW_USERNAME:-$CURRENT_USERNAME}"
+        FINAL_PASSWORD="${NEW_PASSWORD:-$CURRENT_PASSWORD}"
+        
+        # 更新配置文件
+        cat > "$CONFIG_FILE" << EOF
+{
+  "port": 8080,
+  "username": "$FINAL_USERNAME",
+  "password": "$FINAL_PASSWORD",
+  "jwt_secret": "$(openssl rand -hex 32)",
+  "rules": []
+}
+EOF
+        
+        print_success "账号密码已更新！"
+        echo -e "${CYAN}新用户名:${NC} $FINAL_USERNAME"
+        echo -e "${CYAN}新密码:${NC} $FINAL_PASSWORD"
+        
+        # 重启服务使配置生效
+        systemctl restart port-forward-panel
+        print_info "服务已重启，新配置已生效"
+    else
+        print_info "保持默认账号密码"
+    fi
+}
+
 # 显示完成信息
 show_completion() {
     echo ""
@@ -171,9 +217,21 @@ show_completion() {
     # 获取服务器 IP
     SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
     
-    echo -e "${CYAN}访问地址:${NC} http://${SERVER_IP}:8080"
-    echo -e "${CYAN}默认账号:${NC} admin"
-    echo -e "${CYAN}默认密码:${NC} admin123"
+    # 读取配置文件中的账号密码
+    CONFIG_FILE="/opt/port-forward-dashboard/backend/config.json"
+    if [ -f "$CONFIG_FILE" ]; then
+        DISPLAY_USERNAME=$(grep -o '"username"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_FILE" | cut -d'"' -f4)
+        DISPLAY_PASSWORD=$(grep -o '"password"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_FILE" | cut -d'"' -f4)
+    else
+        DISPLAY_USERNAME="admin"
+        DISPLAY_PASSWORD="admin123"
+    fi
+    
+    echo -e "${CYAN}╭──────────────────────────────────────────╮${NC}"
+    echo -e "${CYAN}│${NC}  ${PURPLE}访问地址:${NC} http://${SERVER_IP}:8080"
+    echo -e "${CYAN}│${NC}  ${PURPLE}用户名:${NC}   ${DISPLAY_USERNAME}"
+    echo -e "${CYAN}│${NC}  ${PURPLE}密码:${NC}     ${DISPLAY_PASSWORD}"
+    echo -e "${CYAN}╰──────────────────────────────────────────╯${NC}"
     echo ""
     echo -e "${YELLOW}管理命令:${NC}"
     echo "  启动服务: systemctl start port-forward-panel"
@@ -181,6 +239,7 @@ show_completion() {
     echo "  重启服务: systemctl restart port-forward-panel"
     echo "  查看状态: systemctl status port-forward-panel"
     echo "  查看日志: journalctl -u port-forward-panel -f"
+    echo "  修改密码: bash <(curl -sL https://raw.githubusercontent.com/jiuwovo-ai/tcp-zz/main/deploy.sh) --passwd"
     echo ""
 }
 
@@ -197,4 +256,22 @@ main() {
     show_completion
 }
 
-main "$@"
+# 解析参数
+case "$1" in
+    --passwd|--password|-p)
+        print_banner
+        check_root
+        change_password
+        ;;
+    --help|-h)
+        echo "用法: $0 [选项]"
+        echo ""
+        echo "选项:"
+        echo "  (无参数)     完整安装/更新"
+        echo "  --passwd     修改账号密码"
+        echo "  --help       显示帮助"
+        ;;
+    *)
+        main "$@"
+        ;;
+esac
