@@ -90,12 +90,12 @@
 
         <div class="card card-gradient-yellow animate-fade-in-up animate-delay-3" style="opacity: 0;">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="stat-label">{{ t('dashboard.uptime') }}</p>
-              <p class="stat-value text-yellow-400">{{ formatUptime(store.system.uptime) }}</p>
+              <p class="stat-value text-yellow-400 font-mono whitespace-nowrap">{{ formatUptime(store.system.uptime) }}</p>
               <p class="text-sm text-gray-500 mt-2">{{ store.totalConnections }} {{ t('dashboard.connections') }}</p>
             </div>
-            <div class="icon-container icon-container-yellow">
+            <div class="icon-container icon-container-yellow flex-shrink-0 ml-2">
               <n-icon size="24" class="text-yellow-400">
                 <Time />
               </n-icon>
