@@ -1,0 +1,16 @@
+[Unit]
+Description=Port Forward Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/port-forward-dashboard
+ExecStart=/opt/port-forward-dashboard/port-forward-dashboard
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

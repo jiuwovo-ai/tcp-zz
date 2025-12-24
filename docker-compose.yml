@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  port-forward-dashboard:
+    build: .
+    container_name: port-forward-dashboard
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json
+    environment:
+      - TZ=Asia/Shanghai

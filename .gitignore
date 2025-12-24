@@ -1,0 +1,34 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+port-forward-dashboard
+port-forward-agent
+
+# Go
+go.sum
+
+# Node modules
+node_modules/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config files with secrets
+config.json
+
+# Logs
+*.log
+
+# Build output
+backend/static/
