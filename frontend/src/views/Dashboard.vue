@@ -153,10 +153,10 @@
                     {{ tunnel.rule.protocol.toUpperCase() }}
                   </n-tag>
                 </td>
-                <td class="py-3" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">
-                  <span class="text-blue-400">↑{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
+                <td class="py-3 whitespace-nowrap" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">
+                  <span class="text-blue-400 inline-block w-20 text-right">↑{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
                   <span class="mx-1 text-gray-500">/</span>
-                  <span class="text-green-400">↓{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
+                  <span class="text-green-400 inline-block w-20">↓{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
                 </td>
                 <td class="py-3">
                   <span :class="getLatencyClass(tunnel.latency)">
