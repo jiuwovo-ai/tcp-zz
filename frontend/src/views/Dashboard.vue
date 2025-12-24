@@ -126,7 +126,7 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full">
+          <table class="w-full table-fixed">
             <thead>
               <tr class="text-left text-gray-400 text-sm border-b" :class="settingsStore.isDark ? 'border-dark-border' : 'border-gray-200'">
                 <th class="pb-3 font-medium w-20">{{ t('common.name') }}</th>
