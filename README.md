@@ -1,6 +1,40 @@
-# Port Forward Dashboard
+# Port Forward Dashboard / 端口转发面板
 
-一个高性能、实时监控的端口转发管理面板，采用现代化 UI 设计。
+<p align="center">
+  <strong>🚀 高性能端口转发管理面板 | TCP/UDP 流量转发 | 多节点管理 | 实时监控</strong>
+</p>
+
+<p align="center">
+  <a href="#-一键部署">一键部署</a> •
+  <a href="#-功能特性">功能特性</a> •
+  <a href="#-截图预览">截图预览</a> •
+  <a href="#-技术栈">技术栈</a> •
+  <a href="#-快速开始">快速开始</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go" alt="Go">
+  <img src="https://img.shields.io/badge/Vue-3.x-4FC08D?style=flat-square&logo=vue.js" alt="Vue">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=flat-square&logo=linux" alt="Platform">
+</p>
+
+---
+
+## ✨ 简介
+
+**Port Forward Dashboard** 是一个功能强大的**端口转发管理面板**，支持 **TCP/UDP 协议转发**、**多节点分布式管理**、**实时流量监控**。适用于：
+
+- 🌐 **内网穿透** - 将内网服务暴露到公网
+- 🔀 **端口映射** - 灵活的端口转发规则管理
+- 📊 **流量监控** - 实时查看转发流量和延迟
+- 🖥️ **多节点管理** - 统一管理多台服务器的转发规则
+- 🎮 **游戏加速** - 游戏服务器端口转发
+- 🛡️ **NAT 转发** - NAT 网络环境下的端口映射
+
+**关键词**: 端口转发, 端口映射, 流量转发, TCP转发, UDP转发, 内网穿透, NAT转发, 端口转发面板, 端口转发工具, 流量监控, 多节点管理, Port Forwarding, Traffic Forwarding
+
+---
 
 ## 🚀 一键部署
 
@@ -277,12 +311,43 @@ port-forward-dashboard/
 
 ## 🔮 扩展建议
 
-1. **多节点支持**: 添加节点管理 API，使用 gRPC 通信
-2. **流量限速**: 在 `copyWithStats` 中添加令牌桶限速
-3. **告警通知**: 集成 Webhook/邮件通知
-4. **数据持久化**: 使用 SQLite/PostgreSQL 存储历史数据
-5. **HTTPS**: 配置 TLS 证书
+1. **流量限速**: 在 `copyWithStats` 中添加令牌桶限速
+2. **告警通知**: 集成 Webhook/邮件通知
+3. **数据持久化**: 使用 SQLite/PostgreSQL 存储历史数据
+4. **HTTPS**: 配置 TLS 证书
 
-## 📄 License
+---
+
+## 🌟 Star History
+
+如果这个项目对你有帮助，请给一个 ⭐ Star 支持一下！
+
+---
+
+## � 相关项目
+
+- [frp](https://github.com/fatedier/frp) - 内网穿透工具
+- [nps](https://github.com/ehang-io/nps) - 内网穿透代理服务器
+- [gost](https://github.com/ginuerzh/gost) - GO 语言实现的安全隧道
+
+---
+
+## �📄 License
 
 MIT License
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ by <a href="https://github.com/jiuwovo-ai">jiuwovo-ai</a></sub>
+</p>
+
+<!-- 
+SEO Keywords / 搜索关键词:
+端口转发, 端口转发面板, 端口映射, 流量转发, TCP转发, UDP转发, 
+内网穿透, NAT转发, 端口转发工具, 流量监控, 多节点管理,
+port forwarding, port forward panel, traffic forwarding, 
+tcp forward, udp forward, nat forwarding, tunnel management,
+端口转发管理, 服务器端口转发, Linux端口转发, 端口代理,
+port proxy, network forwarding, 流量中转, 中转面板
+-->
