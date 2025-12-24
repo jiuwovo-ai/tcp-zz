@@ -40,10 +40,11 @@ type LatencyInfo struct {
 }
 
 type TunnelStatus struct {
-	Rule    Rule         `json:"rule"`
-	Traffic TrafficStats `json:"traffic"`
-	Latency LatencyInfo  `json:"latency"`
-	Running bool         `json:"running"`
+	Rule     Rule         `json:"rule"`
+	Traffic  TrafficStats `json:"traffic"`
+	Latency  LatencyInfo  `json:"latency"`
+	Running  bool         `json:"running"`
+	NodeHost string       `json:"node_host,omitempty"`
 }
 
 type SystemStats struct {

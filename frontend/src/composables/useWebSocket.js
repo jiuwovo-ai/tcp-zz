@@ -13,7 +13,8 @@ export function useWebSocket(onMessage) {
     if (!authStore.token) return
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const host = window.location.host
+    // 在开发环境下，WebSocket 需要直接连接到后端
+    const host = import.meta.env.DEV ? 'localhost:8080' : window.location.host
     const url = `${protocol}//${host}/api/ws?token=${authStore.token}`
 
     try {

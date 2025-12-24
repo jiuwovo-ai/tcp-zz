@@ -266,49 +266,72 @@
     </n-modal>
 
     <!-- Install Command Modal -->
-    <n-modal v-model:show="showInstallModal" preset="card" :title="t('nodes.installCommand')" style="width: 700px;">
-      <div class="space-y-4">
-        <n-alert type="info" :title="t('nodes.installTip')">
-          {{ t('nodes.installTipDesc') }}
-        </n-alert>
-
-        <div>
-          <p class="text-sm text-gray-400 mb-2">{{ t('nodes.oneLineInstall') }}</p>
-          <div class="relative">
-            <n-input
-              :value="installCommand"
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 4 }"
-              readonly
-              :class="settingsStore.isDark ? 'bg-dark-bg' : 'bg-gray-100'"
-            />
-            <n-button
-              size="small"
-              type="primary"
-              class="absolute top-2 right-2"
-              @click="copyCommand"
-            >
-              {{ t('nodes.copy') }}
-            </n-button>
+    <n-modal v-model:show="showInstallModal" preset="card" :title="t('nodes.installCommand')" style="width: 720px;">
+      <div class="space-y-6">
+        <!-- Node Info Header -->
+        <div class="flex items-center space-x-4 p-4 rounded-lg" :class="settingsStore.isDark ? 'bg-dark-hover' : 'bg-blue-50'">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center" :class="settingsStore.isDark ? 'bg-blue-500/20' : 'bg-blue-100'">
+            <n-icon size="24" class="text-blue-500"><Server /></n-icon>
+          </div>
+          <div>
+            <h3 class="font-semibold text-lg" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ installNodeName }}</h3>
+            <p class="text-sm text-gray-400">{{ installNodeHost }}</p>
           </div>
         </div>
 
+        <!-- Steps -->
+        <div class="space-y-4">
+          <div class="flex items-start space-x-3">
+            <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium flex-shrink-0">1</div>
+            <div class="flex-1">
+              <p class="font-medium mb-1" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('nodes.installStep1') }}</p>
+              <p class="text-sm text-gray-400">{{ t('nodes.installStep1Desc') }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium flex-shrink-0">2</div>
+            <div class="flex-1">
+              <p class="font-medium mb-2" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('nodes.installStep2') }}</p>
+              <div class="relative">
+                <div class="p-3 rounded-lg font-mono text-sm overflow-x-auto" :class="settingsStore.isDark ? 'bg-gray-900 text-green-400' : 'bg-gray-900 text-green-400'">
+                  <code class="break-all whitespace-pre-wrap">{{ installCommand }}</code>
+                </div>
+                <n-button
+                  size="small"
+                  type="primary"
+                  class="absolute top-2 right-2"
+                  @click="copyCommand"
+                >
+                  <template #icon><n-icon><Copy /></n-icon></template>
+                  {{ copied ? t('nodes.copied') : t('nodes.copy') }}
+                </n-button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium flex-shrink-0">3</div>
+            <div class="flex-1">
+              <p class="font-medium mb-1" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('nodes.installStep3') }}</p>
+              <p class="text-sm text-gray-400">{{ t('nodes.installStep3Desc') }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Script Collapse -->
         <n-collapse>
           <n-collapse-item :title="t('nodes.viewFullScript')" name="script">
-            <n-input
-              :value="installScript"
-              type="textarea"
-              :autosize="{ minRows: 10, maxRows: 20 }"
-              readonly
-              style="font-family: monospace; font-size: 12px;"
-            />
+            <div class="p-3 rounded-lg font-mono text-xs overflow-x-auto max-h-64" :class="settingsStore.isDark ? 'bg-gray-900 text-gray-300' : 'bg-gray-900 text-gray-300'">
+              <pre class="whitespace-pre-wrap">{{ installScript }}</pre>
+            </div>
           </n-collapse-item>
         </n-collapse>
       </div>
 
       <template #footer>
         <n-space justify="end">
-          <n-button @click="showInstallModal = false">{{ t('common.cancel') }}</n-button>
+          <n-button @click="showInstallModal = false">{{ t('common.confirm') }}</n-button>
         </n-space>
       </template>
     </n-modal>
@@ -318,7 +341,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
-import { ArrowBack, Add, Create, Trash, Server, Terminal } from '@vicons/ionicons5'
+import { ArrowBack, Add, Create, Trash, Server, Terminal, Copy } from '@vicons/ionicons5'
 import api from '../api'
 import { useSettingsStore } from '../stores/settings'
 import { useI18n } from '../i18n'
@@ -338,6 +361,9 @@ const toggleLoading = ref({})
 const showInstallModal = ref(false)
 const installCommand = ref('')
 const installScript = ref('')
+const installNodeName = ref('')
+const installNodeHost = ref('')
+const copied = ref(false)
 
 // Node Modal
 const showNodeModal = ref(false)
@@ -594,6 +620,8 @@ async function showInstallCommand(node) {
     if (res.success) {
       installCommand.value = res.data.command
       installScript.value = res.data.script
+      installNodeName.value = node.name
+      installNodeHost.value = node.host
       showInstallModal.value = true
     }
   } catch (error) {
@@ -603,7 +631,11 @@ async function showInstallCommand(node) {
 
 function copyCommand() {
   navigator.clipboard.writeText(installCommand.value)
+  copied.value = true
   message.success(t('nodes.copied'))
+  setTimeout(() => {
+    copied.value = false
+  }, 2000)
 }
 
 onMounted(() => {

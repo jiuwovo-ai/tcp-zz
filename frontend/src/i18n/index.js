@@ -119,14 +119,19 @@ const messages = {
       pleaseSelectNode: 'Please select a node',
       selectNode: 'Node',
       manageNodes: 'Manage Nodes',
-      installCommand: 'Install Command',
+      installCommand: 'Install Node',
       installTip: 'One-Click Installation',
       installTipDesc: 'Copy the command below and run it on your server to automatically install and configure the node agent.',
       oneLineInstall: 'One-line install command:',
       copy: 'Copy',
-      copied: 'Copied to clipboard',
+      copied: 'Copied!',
       viewFullScript: 'View full installation script',
-      generateKey: 'Generate'
+      generateKey: 'Generate',
+      installStep1: 'Login to your server',
+      installStep1Desc: 'SSH into your Linux server with root privileges',
+      installStep2: 'Run the installation command',
+      installStep3: 'Done!',
+      installStep3Desc: 'The node will automatically connect to the panel after installation'
     }
   },
   zh: {
@@ -247,14 +252,19 @@ const messages = {
       pleaseSelectNode: '请选择节点',
       selectNode: '节点',
       manageNodes: '管理节点',
-      installCommand: '安装命令',
+      installCommand: '安装节点',
       installTip: '一键安装',
       installTipDesc: '复制下方命令到您的服务器执行，即可自动安装并配置节点 Agent。',
       oneLineInstall: '一键安装命令：',
       copy: '复制',
-      copied: '已复制到剪贴板',
+      copied: '已复制！',
       viewFullScript: '查看完整安装脚本',
-      generateKey: '生成'
+      generateKey: '生成',
+      installStep1: '登录服务器',
+      installStep1Desc: '使用 SSH 以 root 权限登录您的 Linux 服务器',
+      installStep2: '执行安装命令',
+      installStep3: '完成！',
+      installStep3Desc: '安装完成后节点将自动连接到面板'
     }
   }
 }

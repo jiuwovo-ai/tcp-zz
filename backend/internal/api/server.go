@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
 
 	"port-forward-dashboard/internal/config"
@@ -68,7 +69,6 @@ func (s *Server) setupRoutes() {
 			auth.DELETE("/rules/:id", s.handleDeleteRule)
 			auth.POST("/rules/:id/toggle", s.handleToggleRule)
 			auth.GET("/system", s.handleSystemStats)
-			auth.GET("/ws", s.handleWebSocket)
 
 			// 节点管理
 			auth.GET("/nodes", s.handleGetNodes)
@@ -86,6 +86,9 @@ func (s *Server) setupRoutes() {
 
 		// 节点心跳（不需要JWT认证，使用节点Key认证）
 		api.POST("/nodes/heartbeat", s.handleNodeHeartbeat)
+
+		// WebSocket（自己验证token）
+		api.GET("/ws", s.handleWebSocket)
 
 		// 安装脚本（需要认证）
 		auth.GET("/nodes/:id/install", s.handleGetInstallScript)
@@ -128,12 +131,22 @@ func (s *Server) handleLogin(c *gin.Context) {
 }
 
 func (s *Server) handleDashboard(c *gin.Context) {
-	s.fm.UpdateAllRates()
+	// 获取节点隧道数据（面板只管理节点，不转发流量）
+	tunnels := s.nm.GetAllTunnelStatus()
+	totalIn, totalOut, rateIn, rateOut := s.nm.GetGlobalTraffic()
+	activeCount := s.nm.GetActiveTunnelCount()
+
+	globalTraffic := models.GlobalTraffic{
+		TotalIn:  totalIn,
+		TotalOut: totalOut,
+		RateIn:   rateIn,
+		RateOut:  rateOut,
+	}
 
 	data := models.DashboardData{
-		System:    s.monitor.GetStats(s.fm.GetActiveTunnelCount(), s.fm.GetUptime()),
-		Global:    s.fm.GetGlobalTraffic(),
-		Tunnels:   s.fm.GetAllStatus(),
+		System:    s.monitor.GetStats(activeCount, s.monitor.GetUptime()),
+		Global:    globalTraffic,
+		Tunnels:   tunnels,
 		Timestamp: time.Now().Unix(),
 	}
 
@@ -232,6 +245,23 @@ var upgrader = websocket.Upgrader{
 }
 
 func (s *Server) handleWebSocket(c *gin.Context) {
+	// 支持从 URL 参数获取 token
+	tokenString := c.Query("token")
+	if tokenString == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Missing token"})
+		return
+	}
+
+	// 验证 token
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(s.cfg.JWTSecret), nil
+	})
+	if err != nil || !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Invalid token"})
+		return
+	}
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
@@ -254,12 +284,22 @@ func (s *Server) broadcastLoop() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		s.fm.UpdateAllRates()
+		// 获取节点隧道数据（面板只管理节点，不转发流量）
+		tunnels := s.nm.GetAllTunnelStatus()
+		totalIn, totalOut, rateIn, rateOut := s.nm.GetGlobalTraffic()
+		activeCount := s.nm.GetActiveTunnelCount()
+
+		globalTraffic := models.GlobalTraffic{
+			TotalIn:  totalIn,
+			TotalOut: totalOut,
+			RateIn:   rateIn,
+			RateOut:  rateOut,
+		}
 
 		data := models.DashboardData{
-			System:    s.monitor.GetStats(s.fm.GetActiveTunnelCount(), s.fm.GetUptime()),
-			Global:    s.fm.GetGlobalTraffic(),
-			Tunnels:   s.fm.GetAllStatus(),
+			System:    s.monitor.GetStats(activeCount, s.monitor.GetUptime()),
+			Global:    globalTraffic,
+			Tunnels:   tunnels,
 			Timestamp: time.Now().Unix(),
 		}
 

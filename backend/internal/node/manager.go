@@ -235,6 +235,116 @@ func (m *Manager) GetRulesByNode(nodeID string) []models.NodeRule {
 	return result
 }
 
+// GetAllTunnelStatus 返回所有节点隧道的状态，用于仪表盘显示
+func (m *Manager) GetAllTunnelStatus() []models.TunnelStatus {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	var result []models.TunnelStatus
+
+	// 遍历所有规则，而不是只遍历有状态的节点
+	for _, rule := range m.rules {
+		info, nodeExists := m.nodes[rule.NodeID]
+
+		// 获取节点 IP
+		var nodeHost string
+		if nodeExists {
+			nodeHost = info.Node.Host
+		}
+
+		// 默认状态：离线
+		status := models.TunnelStatus{
+			Rule: models.Rule{
+				ID:         rule.ID,
+				Name:       rule.Name,
+				LocalPort:  rule.LocalPort,
+				TargetIP:   rule.TargetIP,
+				TargetPort: rule.TargetPort,
+				Protocol:   models.Protocol(rule.Protocol),
+				Enabled:    rule.Enabled,
+			},
+			Traffic: models.TrafficStats{},
+			Latency: models.LatencyInfo{
+				Latency: -1,
+				Status:  "error",
+			},
+			Running:  false,
+			NodeHost: nodeHost,
+		}
+
+		// 如果节点在线且有状态，更新实际数据
+		if nodeExists && info.Status != nil {
+			for _, tunnel := range info.Status.Tunnels {
+				if tunnel.ID == rule.ID {
+					status.Traffic = models.TrafficStats{
+						TotalIn:      tunnel.BytesIn,
+						TotalOut:     tunnel.BytesOut,
+						BytesInRate:  tunnel.RateIn,
+						BytesOutRate: tunnel.RateOut,
+					}
+					status.Latency = models.LatencyInfo{
+						Latency: tunnel.Latency,
+						Status:  getLatencyStatus(tunnel.Latency),
+					}
+					status.Running = tunnel.Running
+					break
+				}
+			}
+		}
+
+		result = append(result, status)
+	}
+	return result
+}
+
+// GetGlobalTraffic 返回所有节点的全局流量统计
+func (m *Manager) GetGlobalTraffic() (totalIn, totalOut int64, rateIn, rateOut float64) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	for _, info := range m.nodes {
+		if info.Status == nil {
+			continue
+		}
+		for _, tunnel := range info.Status.Tunnels {
+			totalIn += tunnel.BytesIn
+			totalOut += tunnel.BytesOut
+			rateIn += tunnel.RateIn
+			rateOut += tunnel.RateOut
+		}
+	}
+	return
+}
+
+// GetActiveTunnelCount 返回所有节点的活跃隧道数
+func (m *Manager) GetActiveTunnelCount() int {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	count := 0
+	for _, info := range m.nodes {
+		if info.Status == nil {
+			continue
+		}
+		for _, tunnel := range info.Status.Tunnels {
+			if tunnel.Running {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func getLatencyStatus(latency int64) string {
+	if latency < 0 {
+		return "error"
+	}
+	if latency > 200 {
+		return "warning"
+	}
+	return "normal"
+}
+
 func (m *Manager) sendRuleToNode(info *NodeInfo, rule *models.NodeRule, autoStart bool) error {
 	url := fmt.Sprintf("http://%s:%d/tunnels", info.Node.Host, info.Node.Port)
 

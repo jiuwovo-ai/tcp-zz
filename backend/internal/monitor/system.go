@@ -17,12 +17,15 @@ type SystemMonitor struct {
 	lastUpdate time.Time
 	netRateIn  float64
 	netRateOut float64
+	startTime  time.Time
 	mu         sync.RWMutex
 }
 
 func NewSystemMonitor() *SystemMonitor {
+	now := time.Now()
 	m := &SystemMonitor{
-		lastUpdate: time.Now(),
+		lastUpdate: now,
+		startTime:  now,
 	}
 
 	// 初始化网络计数器
@@ -33,6 +36,10 @@ func NewSystemMonitor() *SystemMonitor {
 
 	go m.updateLoop()
 	return m
+}
+
+func (m *SystemMonitor) GetUptime() int64 {
+	return int64(time.Since(m.startTime).Seconds())
 }
 
 func (m *SystemMonitor) updateLoop() {

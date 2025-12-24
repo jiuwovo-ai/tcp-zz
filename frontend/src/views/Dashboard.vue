@@ -172,7 +172,7 @@
                 :class="settingsStore.isDark ? 'border-dark-border hover:bg-dark-hover' : 'border-gray-100 hover:bg-gray-50'"
               >
                 <td class="py-3" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ tunnel.rule.name }}</td>
-                <td class="py-3" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">{{ tunnel.rule.local_port }}</td>
+                <td class="py-3" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">{{ tunnel.node_host }}:{{ tunnel.rule.local_port }}</td>
                 <td class="py-3" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">{{ tunnel.rule.target_ip }}:{{ tunnel.rule.target_port }}</td>
                 <td class="py-3">
                   <n-tag :type="tunnel.rule.protocol === 'tcp' ? 'info' : 'warning'" size="small">
