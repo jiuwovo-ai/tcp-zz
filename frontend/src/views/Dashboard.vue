@@ -129,13 +129,13 @@
           <table class="w-full">
             <thead>
               <tr class="text-left text-gray-400 text-sm border-b" :class="settingsStore.isDark ? 'border-dark-border' : 'border-gray-200'">
-                <th class="pb-3 font-medium">{{ t('common.name') }}</th>
-                <th class="pb-3 font-medium">{{ t('dashboard.localPort') }}</th>
-                <th class="pb-3 font-medium">{{ t('dashboard.target') }}</th>
-                <th class="pb-3 font-medium">{{ t('dashboard.protocol') }}</th>
-                <th class="pb-3 font-medium">{{ t('dashboard.traffic') }}</th>
-                <th class="pb-3 font-medium">{{ t('dashboard.latency') }}</th>
-                <th class="pb-3 font-medium">{{ t('common.status') }}</th>
+                <th class="pb-3 font-medium w-20">{{ t('common.name') }}</th>
+                <th class="pb-3 font-medium w-44">{{ t('dashboard.localPort') }}</th>
+                <th class="pb-3 font-medium w-44">{{ t('dashboard.target') }}</th>
+                <th class="pb-3 font-medium w-20">{{ t('dashboard.protocol') }}</th>
+                <th class="pb-3 font-medium w-40">{{ t('dashboard.traffic') }}</th>
+                <th class="pb-3 font-medium w-24">{{ t('dashboard.latency') }}</th>
+                <th class="pb-3 font-medium w-28">{{ t('common.status') }}</th>
               </tr>
             </thead>
             <tbody>
