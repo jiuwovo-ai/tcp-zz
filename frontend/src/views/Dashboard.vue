@@ -133,7 +133,7 @@
                 <th class="pb-3 font-medium w-44">{{ t('dashboard.localPort') }}</th>
                 <th class="pb-3 font-medium w-44">{{ t('dashboard.target') }}</th>
                 <th class="pb-3 font-medium w-20">{{ t('dashboard.protocol') }}</th>
-                <th class="pb-3 font-medium w-40">{{ t('dashboard.traffic') }}</th>
+                <th class="pb-3 font-medium" style="width: 200px; min-width: 200px;">{{ t('dashboard.traffic') }}</th>
                 <th class="pb-3 font-medium w-24">{{ t('dashboard.latency') }}</th>
                 <th class="pb-3 font-medium w-28">{{ t('common.status') }}</th>
               </tr>
@@ -153,10 +153,12 @@
                     {{ tunnel.rule.protocol.toUpperCase() }}
                   </n-tag>
                 </td>
-                <td class="py-3 whitespace-nowrap font-mono text-sm" :class="settingsStore.isDark ? 'text-gray-300' : 'text-gray-600'">
-                  <span class="text-blue-400">↑</span><span class="text-blue-400 inline-block" style="width: 80px; text-align: right;">{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
-                  <span class="text-gray-500"> / </span>
-                  <span class="text-green-400">↓</span><span class="text-green-400 inline-block" style="width: 80px;">{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
+                <td class="py-3" style="width: 200px; min-width: 200px; max-width: 200px;">
+                  <div class="flex items-center font-mono text-sm whitespace-nowrap">
+                    <span class="text-blue-400 w-24 text-right">↑{{ formatBytesRate(tunnel.traffic.bytes_out_rate) }}</span>
+                    <span class="text-gray-500 mx-1">/</span>
+                    <span class="text-green-400 w-24">↓{{ formatBytesRate(tunnel.traffic.bytes_in_rate) }}</span>
+                  </div>
                 </td>
                 <td class="py-3">
                   <span :class="getLatencyClass(tunnel.latency)">
