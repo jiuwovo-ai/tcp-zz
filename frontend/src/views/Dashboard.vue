@@ -140,9 +140,15 @@
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold" :class="settingsStore.isDark ? 'text-white' : 'text-gray-900'">{{ t('dashboard.tunnels') }}</h3>
-          <router-link to="/tunnels">
-            <n-button size="small" type="primary">{{ t('dashboard.manage') }}</n-button>
-          </router-link>
+          <n-space>
+            <n-button size="small" type="primary" @click="openAddTunnelModal">
+              <template #icon><n-icon><Add /></n-icon></template>
+              {{ t('tunnels.newTunnel') }}
+            </n-button>
+            <router-link to="/tunnels">
+              <n-button size="small">{{ t('dashboard.manage') }}</n-button>
+            </router-link>
+          </n-space>
         </div>
 
         <div class="overflow-x-auto">
@@ -197,7 +203,7 @@
               </tr>
               <tr v-if="store.tunnels.length === 0">
                 <td colspan="7" class="py-8 text-center text-gray-500">
-                  {{ t('dashboard.noTunnels') }} <router-link to="/tunnels" class="text-blue-400 hover:underline">{{ t('dashboard.addOne') }}</router-link>
+                  {{ t('dashboard.noTunnels') }} <a href="#" @click.prevent="openAddTunnelModal" class="text-blue-400 hover:underline">{{ t('dashboard.addOne') }}</a>
                 </td>
               </tr>
             </tbody>
@@ -205,14 +211,64 @@
         </div>
       </div>
     </main>
+
+    <!-- Add Tunnel Modal -->
+    <n-modal v-model:show="showTunnelModal" preset="card" :title="t('tunnels.newTunnel')" style="width: 500px;">
+      <n-form ref="tunnelFormRef" :model="tunnelForm" :rules="tunnelFormRules" label-placement="left" label-width="100">
+        <n-form-item :label="t('nodes.selectNode')" path="node_id">
+          <n-select
+            v-model:value="tunnelForm.node_id"
+            :options="nodeOptions"
+            :placeholder="t('nodes.pleaseSelectNode')"
+            :loading="nodesLoading"
+          />
+        </n-form-item>
+
+        <n-form-item :label="t('common.name')" path="name">
+          <n-input v-model:value="tunnelForm.name" placeholder="My Tunnel" />
+        </n-form-item>
+
+        <n-form-item :label="t('dashboard.localPort')" path="local_port">
+          <n-input-number v-model:value="tunnelForm.local_port" :min="1" :max="65535" placeholder="8080" style="width: 100%;" />
+        </n-form-item>
+
+        <n-form-item :label="t('tunnels.targetIP')" path="target_ip">
+          <n-input v-model:value="tunnelForm.target_ip" placeholder="192.168.1.100" />
+        </n-form-item>
+
+        <n-form-item :label="t('tunnels.targetPort')" path="target_port">
+          <n-input-number v-model:value="tunnelForm.target_port" :min="1" :max="65535" placeholder="80" style="width: 100%;" />
+        </n-form-item>
+
+        <n-form-item :label="t('dashboard.protocol')" path="protocol">
+          <n-radio-group v-model:value="tunnelForm.protocol">
+            <n-radio-button value="tcp">TCP</n-radio-button>
+            <n-radio-button value="udp">UDP</n-radio-button>
+          </n-radio-group>
+        </n-form-item>
+
+        <n-form-item :label="t('common.enabled')" path="enabled">
+          <n-switch v-model:value="tunnelForm.enabled" />
+        </n-form-item>
+      </n-form>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="showTunnelModal = false">{{ t('common.cancel') }}</n-button>
+          <n-button type="primary" :loading="tunnelSubmitLoading" @click="submitTunnel">
+            {{ t('common.create') }}
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { NIcon } from 'naive-ui'
-import { ArrowUp, ArrowDown, GitNetwork, Time } from '@vicons/ionicons5'
+import { NIcon, useMessage } from 'naive-ui'
+import { ArrowUp, ArrowDown, GitNetwork, Time, Add } from '@vicons/ionicons5'
 import * as echarts from 'echarts'
 import { useDashboardStore } from '../stores/dashboard'
 import { useAuthStore } from '../stores/auth'
@@ -221,8 +277,10 @@ import { useWebSocket } from '../composables/useWebSocket'
 import { useI18n } from '../i18n'
 import { formatBytes, formatBytesRate, formatUptime, formatPercent, formatLatency } from '../utils/format'
 import SettingsDropdown from '../components/SettingsDropdown.vue'
+import api from '../api'
 
 const router = useRouter()
+const message = useMessage()
 const store = useDashboardStore()
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
@@ -230,6 +288,98 @@ const { t } = useI18n()
 
 const chartRef = ref(null)
 let chart = null
+
+// Tunnel Modal
+const showTunnelModal = ref(false)
+const tunnelSubmitLoading = ref(false)
+const tunnelFormRef = ref(null)
+const nodesLoading = ref(false)
+const nodes = ref([])
+
+const tunnelForm = reactive({
+  node_id: null,
+  name: '',
+  local_port: null,
+  target_ip: '',
+  target_port: null,
+  protocol: 'tcp',
+  enabled: true
+})
+
+const nodeOptions = computed(() => {
+  return nodes.value.map(node => ({
+    label: `${node.name} (${node.host})`,
+    value: node.id
+  }))
+})
+
+const tunnelFormRules = computed(() => ({
+  node_id: { required: true, message: t('nodes.pleaseSelectNode'), trigger: 'change' },
+  name: { required: true, message: t('tunnels.pleaseEnterName'), trigger: 'blur' },
+  local_port: { required: true, type: 'number', message: t('tunnels.pleaseEnterLocalPort'), trigger: 'blur' },
+  target_ip: { required: true, message: t('tunnels.pleaseEnterTargetIP'), trigger: 'blur' },
+  target_port: { required: true, type: 'number', message: t('tunnels.pleaseEnterTargetPort'), trigger: 'blur' },
+  protocol: { required: true, message: t('tunnels.pleaseSelectProtocol'), trigger: 'change' }
+}))
+
+async function loadNodes() {
+  nodesLoading.value = true
+  try {
+    const res = await api.getNodes()
+    if (res.success) {
+      nodes.value = res.data || []
+    }
+  } catch (error) {
+    console.error('Failed to load nodes:', error)
+  } finally {
+    nodesLoading.value = false
+  }
+}
+
+function openAddTunnelModal() {
+  loadNodes()
+  showTunnelModal.value = true
+}
+
+function resetTunnelForm() {
+  tunnelForm.node_id = null
+  tunnelForm.name = ''
+  tunnelForm.local_port = null
+  tunnelForm.target_ip = ''
+  tunnelForm.target_port = null
+  tunnelForm.protocol = 'tcp'
+  tunnelForm.enabled = true
+}
+
+async function submitTunnel() {
+  try {
+    await tunnelFormRef.value?.validate()
+  } catch {
+    return
+  }
+
+  tunnelSubmitLoading.value = true
+  try {
+    const payload = {
+      node_id: tunnelForm.node_id,
+      name: tunnelForm.name,
+      local_port: tunnelForm.local_port,
+      target_ip: tunnelForm.target_ip,
+      target_port: tunnelForm.target_port,
+      protocol: tunnelForm.protocol,
+      enabled: tunnelForm.enabled
+    }
+
+    await api.createNodeRule(payload)
+    message.success(t('tunnels.tunnelCreated'))
+    showTunnelModal.value = false
+    resetTunnelForm()
+  } catch (error) {
+    message.error(error.response?.data?.message || t('tunnels.operationFailed'))
+  } finally {
+    tunnelSubmitLoading.value = false
+  }
+}
 
 const { connected: wsConnected, connect: wsConnect } = useWebSocket((data) => {
   if (data.type === 'dashboard') {
