@@ -376,7 +376,7 @@ function initChart() {
   chart.setOption({
     backgroundColor: 'transparent',
     grid: {
-      left: 50,
+      left: 70,
       right: 20,
       top: 20,
       bottom: 30
