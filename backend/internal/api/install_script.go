@@ -44,9 +44,11 @@ func (s *Server) handleDownloadAgent(c *gin.Context) {
 	c.String(http.StatusOK, getAgentDownloadScript())
 }
 
+const githubRawURL = "https://raw.githubusercontent.com/jiuwovo-ai/tcp-zz/main"
+
 func generateOneLineCommand(node models.Node, masterURL string) string {
-	return fmt.Sprintf(`curl -fsSL %s/api/install.sh | bash -s -- --name "%s" --key "%s" --port %d --master "%s"`,
-		masterURL, node.Name, node.Key, node.Port, masterURL)
+	return fmt.Sprintf(`curl -fsSL %s/install.sh | bash -s -- --name "%s" --key "%s" --port %d --master "%s"`,
+		githubRawURL, node.Name, node.Key, node.Port, masterURL)
 }
 
 func generateInstallScript(node models.Node, masterURL string) string {
